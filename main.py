@@ -55,7 +55,7 @@ def takeCommand(language):
 def translation(text,language):
     if language == "pl-PL":
         translator = Translator(from_lang="pl", to_lang="en")
-    elif language == "en-IN":
+    elif language == "en-in":
         translator = Translator(from_lang="en", to_lang="pl")
     else:
         return "Nieobsługiwany język"
@@ -76,9 +76,15 @@ def Hello():
 
 def Take_query():
     Hello()
+    language = takeLanguage()
     while (True):
-        language = takeLanguage()
         query = takeCommand(language)
+        if query == 'angielski':
+            language = 'en-in'
+            continue
+        elif query == 'polski':
+            language = 'pl-PL'
+            continue
         translated=translation(query,language)
         print(translated)
         if "hello" in translated:
