@@ -1,57 +1,66 @@
 
+
 import pyttsx3
 import speech_recognition as sr
 
 from translate import Translator
 
-def translation(text):
-    translator = Translator(to_lang='pl')
-    return translator.translate(text)
-
 def takeLanguage():
     r = sr.Recognizer()
-
     with sr.Microphone() as source:
         print('Listening')
-
         r.pause_threshold = 1
         audio = r.listen(source)
-        try:
-            print("Recognizing")
-            language = r.recognize_google(audio, language='pl-in')
-            print("output = ", language)
-
-        except Exception as e:
-            print(e)
-            print("Say that again")
-            return "None"
+        while True:
+            try:
+                print("Recognizing")
+                language = r.recognize_google(audio, language='pl-PL')
+                language=language.lower()
+                print("output =", language)
+            except Exception as e:
+                print(e)
+                speak("Nie usłyszałem, powtorz jeszcze raz")
+                return "None"
+            if language == "polski":
+                language = "pl-PL"
+                break
+            elif language == "angielski":
+                language = "en-in"
+                break
+            else:
+                speak("Zły komunikat, wybierz język polski lub angielski")
     return language
 
 
 def takeCommand(language):
     r = sr.Recognizer()
-
     with sr.Microphone() as source:
-        print('Listening')
-
+        print(f'Wprowadz komende w jezyku: {language[:2]}')
         r.pause_threshold = 1
         audio = r.listen(source)
         try:
             print("Recognizing")
-
-            if language == "pl":
-                Query = r.recognize_google(audio, language='pl-in')
-            if language == "en":
+            if language == "pl-PL":
+                Query = r.recognize_google(audio, language='pl-PL')
+            elif language == "en-in":
                 Query = r.recognize_google(audio, language='en-in')
-            print("the command is printed=", Query)
+            print("Entered:", Query)
 
         except Exception as e:
             print(e)
-            print("Say that again sir")
+            print("Say again")
             return "None"
 
         return Query
-
+def translation(text,language):
+    if language == "pl-PL":
+        translator = Translator(from_lang="pl", to_lang="en")
+    elif language == "en-IN":
+        translator = Translator(from_lang="en", to_lang="pl")
+    else:
+        return "Nieobsługiwany język"
+    print("Translating...")
+    return translator.translate(text)
 
 def speak(audio):
     engine = pyttsx3.init()
@@ -61,45 +70,29 @@ def speak(audio):
     engine.runAndWait()
 
 
-
-
-
 def Hello():
-    speak("Hejka jestem Ryszard, wybierz język polski lub angielski")
+    speak("Hejka jestem twoim asystentem glosowym, wybierz język polski lub angielski")
 
 
 def Take_query():
     Hello()
-
-
     while (True):
-        query = takeCommand(language).lower()
-        if "polski" in query:
-            language="pl"
-            continue
-        elif "angielski" in query:
-            language="en"
-            continue
-
-
-
-
-        elif "hello" in query:
+        language = takeLanguage()
+        query = takeCommand(language)
+        translated=translation(query,language)
+        print(translated)
+        if "hello" in translated:
             speak("Hello!")
-        elif "open google" in query:
-            speak("Opening Google ")
-            webbrowser.open("www.google.com")
-            continue
+        else:
+            speak(translated)
 
         #exit
-        elif "bywaj"  in query:
+        if "bywaj"  in query:
             speak("Papaaaa!")
             exit()
         elif "goodbye" in query:
             speak("Bye!")
             exit()
-
-
 
 if __name__ == '__main__':
     Take_query()
