@@ -8,50 +8,48 @@ from translate import Translator
 def takeLanguage():
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        print('Listening')
-        r.pause_threshold = 1
-        audio = r.listen(source)
         while True:
             try:
+                print('Listening')
+                r.pause_threshold = 1
+                audio = r.listen(source)
                 print("Recognizing")
                 language = r.recognize_google(audio, language='pl-PL')
                 language=language.lower()
                 print("output =", language)
+
+                if language == "polski":
+                    language = "pl-PL"
+                    break
+                elif language == "angielski":
+                    language = "en-in"
+                    break
+                else:
+                    speak("Zły komunikat, wybierz język polski lub angielski")
             except Exception as e:
                 print(e)
                 speak("Nie usłyszałem, powtorz jeszcze raz")
                 return "None"
-            if language == "polski":
-                language = "pl-PL"
-                break
-            elif language == "angielski":
-                language = "en-in"
-                break
-            else:
-                speak("Zły komunikat, wybierz język polski lub angielski")
     return language
-
 
 def takeCommand(language):
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        print(f'Wprowadz komende w jezyku: {language[:2]}')
+        print(f'Wprowadz komendę w języku: {language[:2]}')
         r.pause_threshold = 1
         audio = r.listen(source)
+
         try:
             print("Recognizing")
-            if language == "pl-PL":
-                Query = r.recognize_google(audio, language='pl-PL')
-            elif language == "en-in":
-                Query = r.recognize_google(audio, language='en-in')
-            print("Entered:", Query)
+            query = r.recognize_google(audio, language=language)
+            print("Entered:", query)
+            return query.lower()
 
         except Exception as e:
             print(e)
-            print("Say again")
+            speak("Powtórz jeszcze raz")
             return "None"
-
-        return Query
+    return query
 def translation(text,language):
     if language == "pl-PL":
         translator = Translator(from_lang="pl", to_lang="en")
@@ -85,6 +83,12 @@ def Take_query():
         elif query == 'polski':
             language = 'pl-PL'
             continue
+        if "bywaj"  in query:
+            speak("Papaaaa!")
+            exit()
+        elif "goodbye" in query:
+            speak("Bye!")
+            exit()
         translated=translation(query,language)
         print(translated)
         if "hello" in translated:
@@ -93,12 +97,7 @@ def Take_query():
             speak(translated)
 
         #exit
-        if "bywaj"  in query:
-            speak("Papaaaa!")
-            exit()
-        elif "goodbye" in query:
-            speak("Bye!")
-            exit()
+
 
 if __name__ == '__main__':
     Take_query()
