@@ -1,5 +1,3 @@
-
-
 import pyttsx3
 import speech_recognition as sr
 
@@ -22,14 +20,14 @@ def takeLanguage():
                     language = "pl-PL"
                     break
                 elif language == "angielski":
-                    language = "en-in"
+                    language = "en-US"
                     break
                 else:
                     speak("Zły komunikat, wybierz język polski lub angielski")
             except Exception as e:
                 print(e)
                 speak("Nie usłyszałem, powtorz jeszcze raz")
-                return "None"
+               # return "None"
     return language
 
 def takeCommand(language):
@@ -53,7 +51,7 @@ def takeCommand(language):
 def translation(text,language):
     if language == "pl-PL":
         translator = Translator(from_lang="pl", to_lang="en")
-    elif language == "en-in":
+    elif language == "en-US":
         translator = Translator(from_lang="en", to_lang="pl")
     else:
         return "Nieobsługiwany język"
@@ -77,27 +75,29 @@ def Take_query():
     language = takeLanguage()
     while (True):
         query = takeCommand(language)
-        if query == 'angielski':
-            language = 'en-in'
+
+        if 'angielski' in query or 'english' in query:
+            language = 'en-US'
+            speak("Switching to English")
             continue
-        elif query == 'polski':
+        elif 'polski' in query or 'polish' in query:
             language = 'pl-PL'
+            speak("Zmieniam język na polski")
             continue
-        if "bywaj"  in query:
+
+        if "bywaj" in query:
             speak("Papaaaa!")
             exit()
         elif "goodbye" in query:
             speak("Bye!")
             exit()
-        translated=translation(query,language)
+
+        translated = translation(query, language)
         print(translated)
         if "hello" in translated:
             speak("Hello!")
         else:
             speak(translated)
-
-        #exit
-
 
 if __name__ == '__main__':
     Take_query()
